@@ -26,7 +26,7 @@ flowchart TB
     RUN -- "fail" --> H
     H -- "fixed test" --> TESTS
     RUN -- "pass" --> REPORT
-    TESTS -- "push / PR to main" --> CI
+    TESTS -- "push / PR to master" --> CI
     CI --> REPORT
 
     classDef agent fill:#E8F0FE,stroke:#1A73E8,stroke-width:2px,color:#0B3D91
@@ -64,7 +64,7 @@ In more detail:
 ## 2. Folder structure
 
 ```
-AgentE2EQAWorkflow-Playwright-main/
+QA_End2End_UsingPlaywrightAgents/
 ├── README.md                     # this file
 ├── package.json                  # dependencies + npm scripts
 ├── playwright.config.ts          # projects, baseURL, reporters, auth setup wiring
@@ -113,8 +113,8 @@ AgentE2EQAWorkflow-Playwright-main/
 ### 3.2 Install
 
 ```bash
-git clone <repo-url>
-cd AgentE2EQAWorkflow-Playwright-main
+git clone https://github.com/rupeshpjadhav/QA_End2End_UsingPlaywrightAgents.git
+cd QA_End2End_UsingPlaywrightAgents
 npm ci                          # installs @playwright/test and TypeScript from package-lock.json
 npx playwright install          # downloads Chromium, Firefox and WebKit
                                 # on Linux/CI use: npx playwright install --with-deps
@@ -311,7 +311,7 @@ Result: 277 passed, 0 failed, 27 skipped (11 skips are by design, 16 are known-b
 
 ```mermaid
 flowchart TB
-    T["<b>Trigger</b><br/>push / PR to main, or manual run"]
+    T["<b>Trigger</b><br/>push / PR to master, or manual run"]
     J["<b>Runner</b><br/>ubuntu-latest · Node 20"]
     S1["npm ci"]
     S2["npx playwright install --with-deps"]
@@ -329,7 +329,7 @@ flowchart TB
     class S3 key
 ```
 
-[`.github/workflows/playwright.yml`](.github/workflows/playwright.yml) runs on every push and pull request to `main`, and can be started manually (**Actions → Playwright Tests → Run workflow**). On `ubuntu-latest` with Node 20 it runs `npm ci`, `npx playwright install --with-deps` and `npx playwright test`. With `CI=true` the config sets `forbidOnly`, **2 retries** (for flaky network calls to the public site) and 2 workers. Traces are recorded on the first retry, and screenshots and video on failure.
+[`.github/workflows/playwright.yml`](.github/workflows/playwright.yml) runs on every push and pull request to `master`, and can be started manually (**Actions → Playwright Tests → Run workflow**). On `ubuntu-latest` with Node 20 it runs `npm ci`, `npx playwright install --with-deps` and `npx playwright test`. With `CI=true` the config sets `forbidOnly`, **2 retries** (for flaky network calls to the public site) and 2 workers. Traces are recorded on the first retry, and screenshots and video on failure.
 
 After the tests, even if they failed, the workflow:
 
