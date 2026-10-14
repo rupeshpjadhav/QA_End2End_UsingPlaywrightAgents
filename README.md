@@ -1,5 +1,7 @@
 # AgentE2EQAWorkflow-Playwright
 
+**Author:** Rupesh Jadhav · [GitHub](https://github.com/rupeshpjadhav) · [LinkedIn](https://www.linkedin.com/in/rupeshj/)
+
 A worked example of an **AI-agent-driven QA workflow** built on [Playwright Test Agents](https://playwright.dev/docs/test-agents): a user story is turned into a test plan (**planner**), the plan into Playwright tests (**generator**), the tests run across browsers and devices, and failures are fixed or flagged (**healer**). The app under test is the [SauceDemo](https://www.saucedemo.com) e-commerce demo site.
 
 - **Target application:** https://www.saucedemo.com (Sauce Labs' public e-commerce demo)
