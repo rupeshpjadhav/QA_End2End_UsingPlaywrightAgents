@@ -12,10 +12,14 @@ export class ProductDetailsPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.name = page.locator('[data-test="inventory-item-name"]');
-    this.description = page.locator('[data-test="inventory-item-desc"]');
-    this.price = page.locator('[data-test="inventory-item-price"]');
-    this.image = page.locator('.inventory_details_img');
+    // Scoped to the details view: the Products list uses the same data-test
+    // names, and right after navigation the URL can change before the list is
+    // replaced. Unscoped, these locators would match all 6 list items.
+    const details = page.locator('.inventory_details');
+    this.name = details.locator('[data-test="inventory-item-name"]');
+    this.description = details.locator('[data-test="inventory-item-desc"]');
+    this.price = details.locator('[data-test="inventory-item-price"]');
+    this.image = details.locator('.inventory_details_img');
     this.addToCartButton = page.locator('[data-test="add-to-cart"]');
     this.removeButton = page.locator('[data-test="remove"]');
     this.backButton = page.locator('[data-test="back-to-products"]');

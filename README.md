@@ -299,7 +299,7 @@ The page objects, fixtures and the other 6 checkout specs were added afterwards.
 
 | Failure | Root cause | Healer action |
 |---|---|---|
-| `product-details.spec.ts` — strict-mode violation after clicking a product image | Timing: the URL changed before the details view replaced the product list | **Fixed the test:** wait for "Back to products" before checking the name |
+| `product-details.spec.ts` — strict-mode violation after clicking a product image | Timing: the URL changed before the details view replaced the product list | **Fixed the test:** wait for "Back to products" before checking the name. *This patched only the one failing test. The same race later failed "Open details from the product name" in CI. The root-cause fix scopes `ProductDetailsPage` locators to the details view (`.inventory_details`), verified with 375 repeated runs across all browsers.* |
 | Reset App State, lazy-load catalog | **Real app bugs:** "Remove" buttons survive a reset; one item is duplicated in every batch | **Marked `test.fixme()`** with a comment |
 | 6 special-user tests (`problem_user`, `error_user`, `visual_user`) | **Simulated app bugs:** broken images, broken sorting, wrong product links, failing Add to cart, random prices | **Marked `test.fixme()`** with a comment |
 
@@ -315,7 +315,7 @@ flowchart TB
     J["<b>Runner</b><br/>ubuntu-latest · Node 20"]
     S1["npm ci"]
     S2["npx playwright install --with-deps"]
-    S3["<b>npx playwright test</b><br/>retries: 2 · workers: 2"]
+    S3["<b>npx playwright test</b><br/>retries: 2 · workers: 2<br/>fails on flaky tests"]
     S4["<b>Write test summary</b><br/>on the run page"]
     S5["<b>Upload playwright-report/</b><br/>always · kept 14 days"]
     S6["<b>Upload test-failure-artifacts</b><br/>only on failure"]
@@ -329,7 +329,7 @@ flowchart TB
     class S3 key
 ```
 
-[`.github/workflows/playwright.yml`](.github/workflows/playwright.yml) runs on every push and pull request to `master`, and can be started manually (**Actions → Playwright Tests → Run workflow**). On `ubuntu-latest` with Node 20 it runs `npm ci`, `npx playwright install --with-deps` and `npx playwright test`. With `CI=true` the config sets `forbidOnly`, **2 retries** (for flaky network calls to the public site) and 2 workers. Traces are recorded on the first retry, and screenshots and video on failure.
+[`.github/workflows/playwright.yml`](.github/workflows/playwright.yml) runs on every push and pull request to `master`, and can be started manually (**Actions → Playwright Tests → Run workflow**). On `ubuntu-latest` with Node 20 it runs `npm ci`, `npx playwright install --with-deps` and `npx playwright test --fail-on-flaky-tests`. With `CI=true` the config sets `forbidOnly`, **2 retries** and 2 workers. Because of `--fail-on-flaky-tests`, a test that fails and then passes on retry still **fails the build**; the retry only provides the trace and confirms the test is flaky rather than broken. Traces are recorded on the first retry, and screenshots and video on failure.
 
 After the tests, even if they failed, the workflow:
 
@@ -384,5 +384,5 @@ flowchart TB
     - `error_user`: an error dialog when sorting, and 3 of 6 "Add to cart" buttons don't work.
     - `visual_user`: random prices.
 - **No visual-regression, API, security (XSS/SQL-injection) or performance tests.** SauceDemo has no real backend API.
-- **The tests depend on the live public site.** Heavy parallel runs can occasionally hit a network timeout. CI retries twice for this reason.
+- **The tests depend on the live public site.** Heavy parallel runs can occasionally hit a network timeout. Since CI fails on flaky tests, such a timeout now fails the build even if the retry passes. If the run summary shows a network error (e.g. `page.goto: net::ERR_…` or a navigation timeout) rather than an assertion, re-run the job.
 - **The historical report** in `test-results/` describes only the first checkout cycle (5 suites, 20 tests), not the current suite. Generate a current one with `npm test` + `npm run report`.

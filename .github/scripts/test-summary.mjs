@@ -20,8 +20,9 @@ const walk = suite => {
   for (const spec of suite.specs ?? []) {
     for (const t of spec.tests) {
       if (t.status === 'unexpected' || t.status === 'flaky') {
-        const last = t.results.at(-1);
-        const error = (last?.error?.message ?? '').replace(/\u001b\[[0-9;]*m/g, '').split('\n')[0];
+        // For flaky tests the last attempt passed, so report the first failure.
+        const failed = t.results.find(r => r.error) ?? t.results.at(-1);
+        const error = (failed?.error?.message ?? '').replace(/\u001b\[[0-9;]*m/g, '').split('\n')[0];
         problems.push({ status: t.status, project: t.projectName, title: `${spec.file} › ${spec.title}`, error });
       }
     }
@@ -30,7 +31,8 @@ const walk = suite => {
 };
 report.suites.forEach(walk);
 
-const icon = unexpected > 0 ? ':x:' : ':white_check_mark:';
+// Flaky tests fail the build too (CI runs with --fail-on-flaky-tests).
+const icon = unexpected > 0 || flaky > 0 ? ':x:' : ':white_check_mark:';
 const lines = [
   `## ${icon} Playwright test results`,
   '',

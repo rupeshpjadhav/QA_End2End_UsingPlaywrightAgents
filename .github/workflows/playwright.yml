@@ -24,8 +24,10 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
+      # Retries still run (so traces are captured), but a test that only passes
+      # on retry fails the build instead of hiding a flaky test.
       - name: Run Playwright tests
-        run: npx playwright test
+        run: npx playwright test --fail-on-flaky-tests
 
       # The steps below run even when tests fail, so every run produces a report.
       - name: Write test summary

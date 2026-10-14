@@ -23,9 +23,6 @@ test.describe('Product Details', () => {
     // 1. Click the Bike Light image
     await page.locator('[data-test="item-0-img-link"]').click();
     await expect(page).toHaveURL(/inventory-item\.html\?id=0$/);
-    // Healer: the URL changes before the details view replaces the product
-    // list, so wait for it; otherwise the name locator matches all 6 products.
-    await expect(productDetailsPage.backButton).toBeVisible();
     await expect(productDetailsPage.name).toHaveText(PRODUCTS.bikeLight.name);
   });
 
