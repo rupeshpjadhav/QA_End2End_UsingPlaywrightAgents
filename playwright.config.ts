@@ -15,9 +15,14 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 2 : undefined,
 
+  // html: the full report (screenshots, videos and traces of failed tests are
+  //       embedded). json: machine-readable results, used by CI to write the
+  //       run summary. github: failure annotations on the PR/commit in CI.
   reporter: [
     ['html', { outputFolder: 'playwright-report', open: 'never' }],
+    ['json', { outputFile: 'test-results/results.json' }],
     ['list'],
+    ...(process.env.CI ? [['github'] as const] : []),
   ],
 
   use: {

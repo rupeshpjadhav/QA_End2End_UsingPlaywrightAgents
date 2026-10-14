@@ -7,3 +7,4 @@ blob-report/
 *.log
 .DS_Store
 .~lock.*#
+test-results/results.json

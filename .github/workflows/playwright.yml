@@ -27,9 +27,25 @@ jobs:
       - name: Run Playwright tests
         run: npx playwright test
 
-      - uses: actions/upload-artifact@v4
-        if: always()
+      # The steps below run even when tests fail, so every run produces a report.
+      - name: Write test summary
+        if: ${{ !cancelled() }}
+        run: node .github/scripts/test-summary.mjs test-results/results.json
+
+      # HTML report: screenshots, videos and traces of failed tests are embedded.
+      - name: Upload HTML report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
         with:
           name: playwright-report
           path: playwright-report/
+          retention-days: 14
+
+      # Raw screenshots/videos/traces as separate files, only when something failed.
+      - name: Upload failure artifacts
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-failure-artifacts
+          path: test-results/artifacts/
           retention-days: 14
